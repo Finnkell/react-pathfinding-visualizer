@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './Node.css';
 
 function Node(props) {
 
-  const [col, setCol] = useState(0);
-  const [row, setRow] = useState(0);
-  const [isStart, setIsStart] = useState();
-  const [isFinal, setIsFinal] = useState();
-  const [isVisited, setIsVisited] = useState();
+  const { row, col, isStart, isFinal, isWall, onMouseDown, onMouseEnter, onMouseUp } = props
 
-  const getProps = () => {
-    setIsFinal(props.isFinal);
-    setIsStart(props.isStart);
-    setIsVisited(props.isVisited);
-  }
-
-  useEffect(() => {
-    getProps();
-  }, []);
-
-  const extraClassName = isFinal ? 'node-finish' : isStart ? 'node-start' : 'node-visited';
+  const extraClassName = isFinal ? 'node-finish' : isStart ? 'node-start' : isWall ? 'node-wall' : '';
 
   return (
-    <div className={`node ${extraClassName}`}>
-
+    <div
+      id={`node-${row}-${col}`}
+      className={`node ${extraClassName}`}
+      onMouseDown={() => onMouseDown(row, col)}
+      onMouseEnter={() => onMouseEnter(row, col)}
+      onMouseUp={() => onMouseUp()}
+    >
     </div>
   );
 }

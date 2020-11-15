@@ -4,13 +4,14 @@ import Node from './Node/Node';
 import './PathfindingVisualizer.css';
 
 const START_NODE_COL = 15;
-const START_NODE_ROW = 10;
+const START_NODE_ROW = 7;
 const FINAL_NODE_COL = 35;
-const FINAL_NODE_ROW = 10;
+const FINAL_NODE_ROW = 7;
 
 function PathfindingVisualizer() {
 
   const [grid, setGrid] = useState([]);
+  const [mouseIsPressed, setMouseIsPressed] = useState(false);
 
   const loadInitalGrid = () => {
     const grid = [];
@@ -50,16 +51,16 @@ function PathfindingVisualizer() {
 
   const animatedDijkstra = (visitedNodesInOrder) => {
     for (let i = 0; i < visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.lenght) {
+        setTimeout(() => {
+          // animatedShortestPath(nodesInShortestPath);
+        }, 10 * i);
+        return;
+      }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-        const newGrid = grid.slice();
-        const newNode = {
-          ...node,
-          isVisited: true,
-        };
-        newGrid[node.row][node.col] = newNode;
-        setGrid(newGrid);
-      }, 50 * i);
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
+      }, 25 * i);
 
     }
   }
@@ -71,25 +72,49 @@ function PathfindingVisualizer() {
     animatedDijkstra(visitedNodesInOrder);
   }
 
+  const handleMouseDown = (row, col) => {
+    const newGrid = getNewGridWithWallToggled(grid, row, col);
+    setGrid(newGrid);
+    setMouseIsPressed(true);
+  }
+
+  const handleMouseEnter = (row, col) => {
+    if (!mouseIsPressed) {
+      return;
+    }
+    const newGrid = getNewGridWithWallToggled(grid, row, col);
+    setGrid(newGrid);
+  }
+
+  const handleMouseUp = () => {
+    setMouseIsPressed(false);
+  }
+
   useEffect(() => {
     loadInitalGrid();
   }, []);
 
   return (
     <>
-      {/* <button type="button" onClick={() => visualizeDijkstra()}>
+      <button type="button" onClick={() => visualizeDijkstra()}>
         Visualize Dijkstra's Algorithm
-      </button> */}
+      </button>
       <div className="grid">
         {grid.map((row, rowIdx) => {
           return <div key={rowIdx}>
             {row.map((node, nodeIdx) => {
-              const { isFinal, isStart, isVisited } = node;
+              const { row, col, isFinal, isStart, isWall } = node;
               return <Node
                 key={nodeIdx}
+                row={row}
+                col={col}
                 isStart={isStart}
                 isFinal={isFinal}
-                isVisited={isVisited}
+                isWall={isWall}
+                mouseIsPressed={mouseIsPressed}
+                onMouseDown={(row, col) => handleMouseDown(row, col)}
+                onMouseEnter={(row, col) => handleMouseEnter(row, col)}
+                onMouseUp={() => handleMouseUp()}
               />
             })}
           </div>
